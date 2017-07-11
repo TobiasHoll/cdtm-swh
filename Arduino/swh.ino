@@ -3,86 +3,63 @@
   #include <avr/power.h>
 #endif
 
-// Game settings
-constexpr int CYCLE_LENGTH = 10000;
-constexpr int FLASH_TOTAL  =  3500;
-constexpr int FLASH_LENGTH =   500;
-constexpr int TICK_USEC    =   750;
-
-// Cup count
-constexpr int CUPS = 10;
-
 // Pins
-constexpr int IRPINS[CUPS] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}; // IR sensor data pins
-constexpr int LEDPIN       = 11;                              // LED strip data pin
-constexpr int SEEDPIN      = A0;                              // Unoccupied analog pin used for random seed
+#define CUPS 10
+constexpr int IRPINS[CUPS] = {2, 1, 4, 3, 6, 7, 5, 8, 9, 10}; // IR sensor data pins
 
-// NeoPixel strip and utilities
-constexpr int LEDS_PER_CUP = 3;
-Adafruit_NeoPixel strip = Adafruit_NeoPixel(CUPS * LEDS_PER_CUP, LEDPIN, NEO_GRB + NEO_KHZ800);
+// Sensor layout is OUT IRPIN - GND - VCC 5V  
 
+// Turn off Neopixel
+#define LEDPIN 11
+#define PIXELS (3 * CUPS)
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(PIXELS, LEDPIN, NEO_GRB + NEO_KHZ800);
 void setCupColor(int cup, int r, int g, int b)
 {
-  for (int i = (cup - 1) * LEDS_PER_CUP; i < cup * LEDS_PER_CUP; ++i)
+  for (int i = (cup - 1) * 3; i < cup * 3; ++i)
     strip.setPixelColor(i, strip.Color(r, g, b));
 }
 void setAllColors(int r, int g, int b)
 {
-  for (int i = 0; i < CUPS * LEDS_PER_CUP; ++i)
+  for (int i = 0; i < CUPS * 3; ++i)
     strip.setPixelColor(i, strip.Color(r, g, b));
-}
-void updateStrip()
-{
-  strip.setBrightness(255);
-  strip.show();
 }
 void disableStrip()
 {
   strip.setBrightness(0);
   strip.show();
 }
-void toggleStrip()
+void updateStrip()
 {
-  strip.setBrightness(255 - strip.getBrightness());
+  strip.setBrightness(255);
   strip.show();
 }
 
-// Setup
+// Set up input pins, turn off LEDs
 void setup() {
-  // Set up serial connection
   Serial.begin(9600);
 
-  // Set up pin mode
-  pinMode(LEDPIN, OUTPUT);
-  for (int index = 0; index < CUPS; ++index)
-    pinMode(IRPINS[index], INPUT);
-
-  // Set up LED strip
   strip.begin();
-  disableStrip();
+  strip.setBrightness(0);
+  strip.show(); // Initialize all pixels to 'off'
+
+  for (int i = 0; i < CUPS; ++i) pinMode(IRPINS[i], INPUT);
 }
 
-// Main loop
+// The main loop
+int x = 0;
 void loop()
 {
-  if (digitalRead(4) || digitalRead(6) || digitalRead(7)) {
-    setAllColors(0, 255, 0);
-    updateStrip();
-    delay(1000);
-    setAllColors(0, 0, 0);
-    updateStrip();
-  } else if (digitalRead(10)) {
-    setAllColors(255, 0, 0);
-    updateStrip();
-    delay(1000);
-    setAllColors(0, 0, 0);
-    updateStrip();
-  } else {
-    setAllColors(0, 0, 0);
-    setCupColor(4, 0, 255, 255);
-    setCupColor(6, 0, 255, 255);
-    setCupColor(7, 0, 255, 255);
-    updateStrip();
-    delay(10);
+  // Enable celebration mode if the sensor triggers
+  for (int i = 0; i < CUPS; ++i)
+  {
+    int ir = digitalRead(IRPINS[i]);
+    if (ir) {
+      Serial.print(x++ );Serial.print(": cup "); Serial.print(i + 1); Serial.print(" at pin "); Serial.println(IRPINS[i]);
+      setCupColor(i + 1, 0, 255, 0);
+      updateStrip();
+      delay(200);
+      setAllColors(0, 0, 0);
+      updateStrip();
+    }
   }
 }
