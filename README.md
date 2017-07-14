@@ -10,7 +10,9 @@ A green light within the cups indicates where the player needs to hit. If he suc
 
 3 cups are lit up green and 7 are lit up red. The cups colours change every 4 secods to make it more difficult. If you hit a green cup, a shot is dispensed. If not you can throw again (3 balls normally)
 
-[![Alt text](https://img.youtube.com/vi/cWcqSVTLIn0/0.jpg)](https://www.youtube.com/watch?v=cWcqSVTLIn0)
+<p align="center"><a href="https://www.youtube.com/watch?v=cWcqSVTLIn0">
+  <img src="https://img.youtube.com/vi/cWcqSVTLIn0/0.jpg" title="Beerpong-machine" width="640" />
+</a></p>
 
 ## Components and where to get them
 ### Beerpong Box
