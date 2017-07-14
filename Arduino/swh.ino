@@ -8,6 +8,7 @@ constexpr int TICK_MSEC    =     1;
 constexpr int CYCLE_TICKS  =  4000;
 constexpr int FLASH_COUNT  =     3;
 constexpr int FLASH_TICKS  =   500;
+constexpr int TARGET_CUPS  =     3;
 
 // Cup count
 constexpr int CUPS = 10;
@@ -129,26 +130,57 @@ void setup() {
 void loop()
 {
   static int tickInCycle = 0;
-  static int currentTarget = 0;
+  static int currentTargets[TARGET_CUPS] = {0, 0, 0};
 
   if (tickInCycle == 0)
   {
     // New cycle, select next target
-    int nextTarget = currentTarget;
-    while (nextTarget == currentTarget) nextTarget = random(CUPS);
-    currentTarget = nextTarget;
+    if (TARGET_CUPS == 1)
+    {
+      int nextTarget = currentTargets[0];
+      while (nextTarget == currentTargets[0]) nextTarget = random(CUPS);
+      currentTargets[0] = nextTarget;
+    }
+    else
+    {
+      for (int target = 0; target < TARGET_CUPS; ++target)
+      {
+retry:
+        int nextTarget = random(CUPS);
+        for (int other = 0; other < target; ++other)
+          if (nextTarget == currentTargets[other])
+            goto retry;
+            
+        currentTargets[target] = nextTarget;
+      }
+    }
 
     // Update cup colors
     setAllColors(255, 0, 0);
-    setCupColor(currentTarget, 0, 255, 0);
+    for (int target = 0; target < TARGET_CUPS; ++target)
+      setCupColor(currentTargets[target], 0, 255, 0);
     updateStrip();
   }
-  
+
+  // Check the IR sensors for events
   event evt = event::NONE;
   for (int index = 0; index < CUPS; ++index)
+  {
     if (digitalRead(IRPINS[index]))
-      evt = (index == currentTarget) ? event::FLASH_CORRECT : event::FLASH_WRONG;
-
+    {
+      for (int target = 0; target < TARGET_CUPS; ++target)
+      {
+         if (index == currentTargets[target])
+         {
+           evt = event::FLASH_CORRECT;
+           break;
+         }
+         else evt = event::FLASH_WRONG;
+      }
+      break;
+    }
+  }
+  
   switch (evt)
   {
     case event::FLASH_CORRECT:
