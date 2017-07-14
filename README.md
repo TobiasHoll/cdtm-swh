@@ -1,4 +1,3 @@
-# cdtm-swh
 # Interactive Beerpong Table (Single Player)
 
 An interactive beerpong game that allows to play beerpong in an arcade game style.
@@ -10,6 +9,8 @@ A green light within the cups indicates where the player needs to hit. If he suc
 ## Gameplay
 
 3 cups are lit up green and 7 are lit up red. The cups colours change every 4 secods to make it more difficult. If you hit a green cup, a shot is dispensed. If not you can throw again (3 balls normally)
+
+[![Alt text](https://img.youtube.com/vi/cWcqSVTLIn0/0.jpg)](https://www.youtube.com/watch?v=cWcqSVTLIn0)
 
 ## Components and where to get them
 ### Beerpong Box
@@ -31,7 +32,7 @@ A green light within the cups indicates where the player needs to hit. If he suc
 
 ## Assembly of the Beerpong-box
 
-Check out the [Youtube video](LINK) to see how it's built. This should provide you with enough details, so you can reproduce it.
+Check out the [Youtube video](https://www.youtube.com/watch?v=cWcqSVTLIn0) to see how it's built. This should provide you with enough details, so you can reproduce it.
 
 ### Cups (repeat this 10 times) 
 * Wire up 3 LEDS per cup
